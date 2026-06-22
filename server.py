@@ -181,8 +181,12 @@ async def delete_pastry(item_id: str, _Secret: str = Depends(authorize_admin)):
         raise HTTPException(status_code=500, detail=str(e))
 
 # Serve static assets
+print(f"DEBUG: os.path.exists('public') = {os.path.exists('public')}", flush=True)
 if os.path.exists("public"):
+    print("DEBUG: Mounting static files at '/'", flush=True)
     app.mount("/", StaticFiles(directory="public", html=True), name="public")
+else:
+    print("DEBUG: public directory not found!", flush=True)
 
 if __name__ == "__main__":
     import uvicorn
