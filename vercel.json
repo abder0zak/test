@@ -12,6 +12,10 @@
       "dest": "server.py"
     },
     {
+      "src": "/uploads/(.*)",
+      "dest": "server.py"
+    },
+    {
       "handle": "filesystem"
     },
     {
