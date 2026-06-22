@@ -8,19 +8,29 @@ from fastapi.staticfiles import StaticFiles
 app = FastAPI()
 PORT = 3000
 ADMIN_SECRET = "Maison2026"
-# Use /tmp/ on Vercel so the database can initialize cleanly without permission crashes
-import sys
-if "vercel" in sys.modules or os.environ.get("VERCEL"):
-    DB_FILE = "/tmp/pastries.db"
+# Persistent storage detection for Render / Railway / Vercel
+IS_VERCEL = bool(os.environ.get("VERCEL"))
+IS_RENDER = bool(os.environ.get("RENDER"))
+IS_RAILWAY = bool(os.environ.get("RAILWAY_ENVIRONMENT"))
+
+if IS_VERCEL:
+    BASE_PERSISTENT = "/tmp"
+elif IS_RENDER:
+    BASE_PERSISTENT = "/data"
+elif IS_RAILWAY:
+    BASE_PERSISTENT = os.environ.get("RAILWAY_VOLUME_MOUNT_PATH", "/mnt/data")
+else:
+    BASE_PERSISTENT = None   # local dev
+
+if BASE_PERSISTENT:
+    DB_FILE = os.path.join(BASE_PERSISTENT, "pastries.db")
+    UPLOAD_DIR = os.path.join(BASE_PERSISTENT, "uploads")
 else:
     DB_FILE = "pastries.db"
-    
-if "vercel" in sys.modules or os.environ.get("VERCEL"):
-    UPLOAD_DIR = "/tmp/uploads"
-else:
     UPLOAD_DIR = os.path.join("public", "uploads")
 
-# Only try to create the directory locally, or use /tmp/ on Vercel
+# Ensure the directories exist (Render/Railway: the mount point already exists;
+# locally we create it if needed)
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
@@ -191,4 +201,3 @@ else:
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run('server:app', host="0.0.0.0", port=PORT,reload=True)
-    app.mount("/", StaticFiles(directory="public", html=True), name="public")
