@@ -15,10 +15,13 @@ if "vercel" in sys.modules or os.environ.get("VERCEL"):
 else:
     DB_FILE = "pastries.db"
     
-# Automatically construct the local directory for saved uploads if it doesn't exist
-UPLOAD_DIR = os.path.join("public", "uploads")
-if not os.path.exists(UPLOAD_DIR):
-    os.makedirs(UPLOAD_DIR, exist_ok=True)
+if "vercel" in sys.modules or os.environ.get("VERCEL"):
+    UPLOAD_DIR = "/tmp/uploads"
+else:
+    UPLOAD_DIR = os.path.join("public", "uploads")
+
+# Only try to create the directory locally, or use /tmp/ on Vercel
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # Database Helper function to get a clean connection connection channel
 def get_db_connection():
