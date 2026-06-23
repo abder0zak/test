@@ -7,8 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 PORT = 3000
-ADMIN_SECRET = "Maison2026"
-# Persistent storage detection for Render / Railway / Vercel
+
 IS_VERCEL = bool(os.environ.get("VERCEL"))
 IS_RENDER = bool(os.environ.get("RENDER"))
 IS_RAILWAY = bool(os.environ.get("RAILWAY_ENVIRONMENT"))
@@ -29,8 +28,6 @@ else:
     DB_FILE = "pastries.db"
     UPLOAD_DIR = os.path.join("public", "uploads")
 
-# Ensure the directories exist (Render/Railway: the mount point already exists;
-# locally we create it if needed)
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
