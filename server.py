@@ -43,7 +43,8 @@ def read_admin():
 
 # 4. STATIC CSS/JS ASSETS
 # Mount the rest of the public folder so images/styles load properly
-app.mount("/", StaticFiles(directory="public"), name="public")
+if os.path.exists("public"):
+ app.mount("/", StaticFiles(directory="public"), name="public")
 
 
 # 5. LOCAL RUNNER CONFIGURATION
